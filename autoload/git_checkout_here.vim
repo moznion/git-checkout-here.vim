@@ -20,14 +20,24 @@ function! git_checkout_here#checkoutHere()
     let l:cmd_input = l:cmd_input . 'n\n'
   endfor
 
+  " Not include `y\n`
   if empty(matchstr(l:cmd_input, 'y\\n'))
     echo "Nothing to do"
     return
   endif
 
+  if input('Check out here? (y/n) [n]: ') != 'y'
+    redraw
+    echo "Aborted"
+    return
+  endif
+
   let l:filename  = expand("%:p")
   let l:cmd_input = l:cmd_input . 'y\n' " for last confirmation of not staged
+
+  " Execute `git checkout HEAD -p` command with no interactions
   call system('echo -e "' . l:cmd_input . '" | git checkout HEAD --patch ' . l:filename)
+
   edit " re-render
 endfunction
 
@@ -37,6 +47,9 @@ function! s:get_diff_block_with_range_by_git_diff()
   let l:diff = system("git diff")
   let l:lines = split(l:diff, '\n')
   for l:line in l:lines
+    " Following regex extracts;
+    "   @@ -10,5 +10,10 @@
+    "             ~~~~~
     let l:range = matchstr(l:line, '^@@ -\d\+,\d\+ +\zs\d\+,\d\+\ze @@')
     if !l:range
       continue
