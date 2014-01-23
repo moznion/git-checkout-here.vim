@@ -40,10 +40,14 @@ function! git_checkout_here#checkoutHere()
   if input('Check out here? (y/n) [n]: ') != 'y'
     redraw
     highlight clear gitCheckoutHere
+    syntax off
+    syntax on
     echo "Aborted"
     return
   endif
   highlight clear gitCheckoutHere
+  syntax off
+  syntax on
 
   let l:filename  = expand("%:p")
   let l:cmd_input = l:cmd_input . 'y\n' " for last confirmation of not staged
