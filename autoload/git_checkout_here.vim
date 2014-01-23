@@ -14,6 +14,16 @@ function! git_checkout_here#checkoutHere()
   for l:order in l:diff_block_with_range
     if l:order['start'] <= l:current_line && l:current_line <= l:order['end']
       let l:cmd_input = l:cmd_input . 'y\n'
+
+      let l:highlight_line_num = l:order['start']
+      while l:highlight_line_num <= l:order['end']
+        let l:eval_code = 'syntax match gitCheckoutHere /^' . getline(l:highlight_line_num) . '$/'
+        execute(l:eval_code)
+
+        highlight gitCheckoutHere ctermbg=yellow guibg=yellow
+        let l:highlight_line_num += 1
+      endwhile
+      redraw
       continue
     endif
 
@@ -28,9 +38,11 @@ function! git_checkout_here#checkoutHere()
 
   if input('Check out here? (y/n) [n]: ') != 'y'
     redraw
+    highlight clear gitCheckoutHere
     echo "Aborted"
     return
   endif
+  highlight clear gitCheckoutHere
 
   let l:filename  = expand("%:p")
   let l:cmd_input = l:cmd_input . 'y\n' " for last confirmation of not staged
