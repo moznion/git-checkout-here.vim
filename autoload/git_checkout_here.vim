@@ -17,7 +17,10 @@ function! git_checkout_here#checkoutHere()
 
       let l:highlight_line_num = l:order['start']
       while l:highlight_line_num <= l:order['end']
-        let l:line = substitute(getline(l:highlight_line_num), '/', '\\/', 'g')
+        let l:line = getline(l:highlight_line_num)
+        let l:line = substitute(l:line, '/', '\\/', 'g')
+        let l:line = substitute(l:line, '[', '\\[', 'g')
+        let l:line = substitute(l:line, ']', '\\]', 'g')
         let l:eval_code = 'syntax match gitCheckoutHere /^' . l:line . '$/'
         execute(l:eval_code)
 
