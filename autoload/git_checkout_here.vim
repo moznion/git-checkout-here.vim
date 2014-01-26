@@ -16,17 +16,20 @@ function! git_checkout_here#checkoutHere()
       let l:cmd_input = l:cmd_input . 'y\n'
 
       let l:highlight_line_num = l:order['start']
+      let l:target_code = ''
+
       while l:highlight_line_num <= l:order['end']
         let l:line = getline(l:highlight_line_num)
         let l:line = substitute(l:line, '/', '\\/', 'g')
         let l:line = substitute(l:line, '[', '\\[', 'g')
         let l:line = substitute(l:line, ']', '\\]', 'g')
-        let l:eval_code = 'syntax match gitCheckoutHere /^' . l:line . '$/'
-        execute(l:eval_code)
-
-        highlight gitCheckoutHere ctermbg=yellow guibg=yellow
+        let l:target_code = l:target_code . l:line . '\n'
         let l:highlight_line_num += 1
       endwhile
+      let l:target_code = strpart(l:target_code, 0, strlen(l:target_code) - 2) " chomp
+      let l:eval_code = 'syntax match gitCheckoutHere /^' . l:target_code . '/'
+      execute(l:eval_code)
+      highlight gitCheckoutHere ctermbg=yellow guibg=yellow
       redraw
       continue
     endif
